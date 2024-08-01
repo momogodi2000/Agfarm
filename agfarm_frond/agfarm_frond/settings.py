@@ -39,17 +39,21 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'myapp',
     'rest_framework',
+    'corsheaders',
+
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'agfarm_frond.urls'
@@ -74,6 +78,9 @@ WSGI_APPLICATION = 'agfarm_frond.wsgi.application'
 
 AUTH_USER_MODEL = 'myapp.CustomUser'
 
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:3000",  # Update with your frontend URL
+]
 
 
 # Database
