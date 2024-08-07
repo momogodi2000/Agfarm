@@ -4,25 +4,42 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model, authenticate, login, logout
 from .serializers import UserSerializer, RegisterSerializer
 import random
+from django.contrib.auth.hashers import check_password
 
 User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
+    def post(self, request):
+        user_data = request.data
+        try:
+            serializer_class = RegisterSerializer(data=user_data)
+            if serializer_class.is_valid():
+                serializer_class.save()
+                return Response({
+                    "message": "User registered successfully !"
+                }, status.HTTP_200_OK)  
+            return Response({
+                "message": "Error "+str(serializer_class.errors)
+            }, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"message": str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class LoginView(generics.GenericAPIView):
     permission_classes = [AllowAny]
-
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        try:
+            user = User.objects.get(username=username)
+            if not check_password(password, user.password):
+                return Response(
+                {"message": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
+                )
             login(request, user)
-            return Response(UserSerializer(user).data)
-        return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(UserSerializer(user).data, status=status.HTTP_200_OK)
+        except user.DoesNotExist:
+            return Response({'error': 'Invalid Credentials'}, status=status.HTTP_400_BAD_REQUEST)    
 
 class LogoutView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
