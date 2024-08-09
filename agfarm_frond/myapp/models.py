@@ -7,6 +7,7 @@ class CustomUser(AbstractUser):
         ("admin", "Admin"),
         ("financial_institution", "Financial Institution"),
         ("farmer", "Farmer"),
+        ('buyer', 'Buyer'),
         ("government_agency", "Government Agency"),
         ("logistics_provider", "Logistics Provider"),
     ]
