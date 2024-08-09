@@ -1,4 +1,5 @@
 from rest_framework import generics, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth import get_user_model, authenticate, login, logout
@@ -8,8 +9,7 @@ from django.contrib.auth.hashers import check_password
 
 User = get_user_model()
 
-class RegisterView(generics.CreateAPIView):
-    permission_classes = [AllowAny]
+class RegisterView(APIView):
     def post(self, request):
         user_data = request.data
         try:
@@ -30,8 +30,8 @@ class LoginView(generics.GenericAPIView):
     def post(self, request, *args, **kwargs):
         username = request.data.get('username')
         password = request.data.get('password')
+        user = User.objects.get(username=username)
         try:
-            user = User.objects.get(username=username)
             if not check_password(password, user.password):
                 return Response(
                 {"message": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST
